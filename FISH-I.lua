@@ -1,3 +1,6 @@
+Berikut adalah kode lengkap dengan tambahan Auto Fish Super Blatant yang bisa diatur delaynya dari 0-100:
+
+```lua
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 WindUI:AddTheme({
@@ -269,7 +272,7 @@ Player:Button({
                     if hrp then
                         hrp.CFrame = CFrame.new(pos)
                     end
-                end)
+                end
             end
         end
     end
@@ -534,29 +537,7 @@ local function fishingCycle()
     initialSetupDone = false
 end
 
-local autoFishingToggle = Auto:Toggle({
-    Title = "Auto Fishing", 
-    Type = "Toggle",
-    Desc = "INSTANT FISHING - WITH ANTI STUCK SYSTEM",
-    Default = false,
-    Callback = function(state) 
-        running = state
-        autoFishingRunning = state 
-        if running then
-            task.spawn(fishingCycle)
-        else
-            safeInvoke(RFCancelFishingInputs)
-            equipped = false
-            fishCheckEnabled = false
-            initialSetupDone = false
-        end
-    end
-})
-
-Auto:Space()
-Auto:Divider()
-
-local autoFishingToggle = Auto:Toggle({
+autoFishingToggle = Auto:Toggle({
     Title = "Auto Fishing", 
     Type = "Toggle",
     Desc = "INSTANT FISHING - WITH ANTI STUCK SYSTEM",
@@ -589,16 +570,21 @@ local superBlatantEquipped = false
 
 local SuperBlatantDelayInput = Auto:Input({
     Title = "Super Blatant Delay",
-    Placeholder = "0.1 - 100 (Default: 0.1)",
+    Placeholder = "0 - 100 (Default: 0.1)",
     Callback = function(value)
         local numValue = tonumber(value)
-        if numValue and numValue >= 0.1 and numValue <= 100 then
+        if numValue and numValue >= 0 and numValue <= 100 then
             superBlatantDelay = numValue
+            WindUI:Notify({
+                Title = "Delay Updated",
+                Content = "Super Blatant Delay set to: " .. numValue,
+                Duration = 3,
+            })
         else
             superBlatantDelay = 0.1
             WindUI:Notify({
                 Title = "Invalid Delay",
-                Content = "Please enter a value between 0.1 and 100",
+                Content = "Please enter a value between 0 and 100",
                 Duration = 3,
             })
         end
@@ -607,29 +593,47 @@ local SuperBlatantDelayInput = Auto:Input({
 
 local function superBlatantEquipTool()
     if not superBlatantEquipped then
-        for i = 1, 2 do
+        for i = 1, 3 do
             safeFire(REEquipToolFromHotbar, 1)
         end
         superBlatantEquipped = true
     end
 end
 
+local function superBlatantResetTool()
+    safeFire(REUnequipToolFromHotbar)
+    superBlatantEquipped = false
+    superBlatantEquipTool()
+end
+
 local function superBlatantFishing()
     while superBlatantRunning do
+        -- Equip tool first
         superBlatantEquipTool()
         
-        -- Cast rod dengan delay minimal
+        -- Cast fishing rod dengan delay
         safeInvoke(RFChargeFishingRod, 2)
-        task.wait(superBlatantDelay)
-        
-        -- Request fishing start
-        safeInvoke(RFRequestFishingMinigameStarted, -1.25, 1)
-        task.wait(superBlatantDelay)
-        
-        -- Spam completed untuk instant catch
-        for i = 1, 3 do
-            safeFire(REFishingCompleted)
+        if superBlatantDelay > 0 then
             task.wait(superBlatantDelay)
+        end
+        
+        -- Request fishing start dengan delay
+        safeInvoke(RFRequestFishingMinigameStarted, -1.25, 1)
+        if superBlatantDelay > 0 then
+            task.wait(superBlatantDelay)
+        end
+        
+        -- Spam completed untuk instant catch dengan delay
+        for i = 1, 5 do
+            safeFire(REFishingCompleted)
+            if superBlatantDelay > 0 then
+                task.wait(superBlatantDelay)
+            end
+        end
+        
+        -- Reset tool secara berkala untuk menghindari stuck
+        if math.random(1, 10) == 1 then
+            superBlatantResetTool()
         end
     end
 end
@@ -647,13 +651,25 @@ local SuperBlatantToggle = Auto:Toggle({
                 autoFishingToggle:Set(false)
             end
             task.spawn(superBlatantFishing)
+            WindUI:Notify({
+                Title = "Super Blatant ON",
+                Content = "Super Blatant Fishing started with delay: " .. superBlatantDelay,
+                Duration = 3,
+            })
         else
             safeInvoke(RFCancelFishingInputs)
             superBlatantEquipped = false
+            WindUI:Notify({
+                Title = "Super Blatant OFF",
+                Content = "Super Blatant Fishing stopped",
+                Duration = 3,
+            })
         end
     end
 })
 
+Auto:Space()
+Auto:Divider()
 
 local Section = Auto:Section({ 
     Title = "Teleport Feature",
