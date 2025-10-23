@@ -1,7 +1,7 @@
 Berikut adalah kode lengkap dengan tambahan Auto Fish Super Blatant yang bisa diatur delaynya dari 0-100:
 
 ```lua
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/refs/heads/main/main.lua"))()
 
 WindUI:AddTheme({
     Name = "Fyy Exploit", 
