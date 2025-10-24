@@ -1,5 +1,5 @@
 --Github WindUI
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/AndraaREz/nopetest/refs/heads/GUI/main.lua"))()
 
 --Tema--
 WindUI:AddTheme({
